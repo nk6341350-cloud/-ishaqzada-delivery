@@ -10,6 +10,7 @@
   <link rel="apple-touch-icon" href="assets/logo.jpeg">
   <link rel="stylesheet" href="styles.css">
   <style>.top-actions{display:flex;align-items:center;gap:7px}.install-btn{border:1px solid #dcc38d;background:#fff8e9;color:#8a630f;border-radius:12px;padding:10px 11px;font:700 12px Tahoma}.profile-upload{display:flex!important;min-height:95px;align-items:center;justify-content:center;margin-bottom:14px!important}.install-dialog{border-radius:24px!important;margin:auto!important;padding:0!important}.install-dialog>div{padding:26px;text-align:center;position:relative}.dialog-x{position:absolute;left:15px;top:15px;border:0;background:#edf1f5;width:38px;height:38px;border-radius:12px;font-size:22px}.install-icon{width:74px;height:74px;margin:10px auto 18px;border-radius:22px;display:grid;place-items:center;background:#edf3f9;color:#082a52;font-size:30px}.install-dialog p{color:#748196;line-height:1.9;margin-bottom:20px}</style>
+  <style>.avatar{overflow:hidden;position:relative}.avatar img{display:none;width:100%;height:100%;object-fit:cover}.avatar.has-photo img{display:block}.avatar.has-photo span{display:none}.user-identity{display:flex;align-items:center;gap:10px}.user-photo{width:48px;height:48px;border-radius:13px;object-fit:cover;background:#edf2f7;border:1px solid #e2e7ec}</style>
   <title>اسحاق‌زاده آنلاین ډیلیوري</title>
 </head>
 <body>
@@ -44,7 +45,7 @@
       <section id="pendingView" class="view center pending"><div class="status-orb">⌛</div><h2>د تایید په انتظار</h2><p>ستاسې معلومات اډمین ته رسېدلي. له تایید وروسته اپلیکیشن وکاروئ.</p><button id="pendingLogout" class="secondary">وتل</button></section>
 
       <section id="homeView" class="view page">
-        <div class="welcome"><div><small>ښه راغلاست</small><h2 id="userName">—</h2><span id="roleBadge" class="pill"></span></div><div id="avatar" class="avatar">ا</div></div>
+        <div class="welcome"><div><small>ښه راغلاست</small><h2 id="userName">—</h2><span id="roleBadge" class="pill"></span></div><div id="avatar" class="avatar"><img id="avatarImg" alt="شخصي عکس"><span id="avatarFallback">ا</span></div></div>
         <div class="stats"><article><span>د دې هفتې آرډرونه</span><strong id="weekCount">۰</strong><small>ثبت شوي</small></article><article class="gold"><span>ټولې افغانۍ</span><strong id="weekMoney">۰</strong><small>؋ افغانۍ</small></article></div>
         <div class="section-head"><h3 id="ordersTitle">زما وروستي آرډرونه</h3><button id="newOrderBtn">＋ نوی آرډر</button></div>
         <div id="ordersList" class="orders"></div><div id="ordersEmpty" class="empty"><span>📦</span><h3>آرډر نشته</h3><p>تر اوسه کوم آرډر نه دی ثبت شوی.</p></div>
