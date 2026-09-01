@@ -1,94 +1,88 @@
 <!doctype html>
 <html lang="ps" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#082a52" />
-  <meta name="description" content="د اسحاق‌زاده آنلاین ډیلیوري د آرډرونو مدیریت" />
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" href="assets/logo.jpeg" />
-  <link rel="apple-touch-icon" href="assets/logo.jpeg" />
-  <link rel="stylesheet" href="styles.css" />
-  <style>.brand strong{font-size:22px}.brand span{font-size:13px;letter-spacing:.6px}</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#082a52">
+  <meta name="description" content="د اسحاق‌زاده آنلاین ډیلیوري د آرډرونو مدیریت">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/logo.jpeg">
+  <link rel="apple-touch-icon" href="assets/logo.jpeg">
+  <link rel="stylesheet" href="styles.css">
+  <style>.top-actions{display:flex;align-items:center;gap:7px}.install-btn{border:1px solid #dcc38d;background:#fff8e9;color:#8a630f;border-radius:12px;padding:10px 11px;font:700 12px Tahoma}.profile-upload{display:flex!important;min-height:95px;align-items:center;justify-content:center;margin-bottom:14px!important}.install-dialog{border-radius:24px!important;margin:auto!important;padding:0!important}.install-dialog>div{padding:26px;text-align:center;position:relative}.dialog-x{position:absolute;left:15px;top:15px;border:0;background:#edf1f5;width:38px;height:38px;border-radius:12px;font-size:22px}.install-icon{width:74px;height:74px;margin:10px auto 18px;border-radius:22px;display:grid;place-items:center;background:#edf3f9;color:#082a52;font-size:30px}.install-dialog p{color:#748196;line-height:1.9;margin-bottom:20px}</style>
   <title>اسحاق‌زاده آنلاین ډیلیوري</title>
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div class="brand">
-        <img src="assets/logo.jpeg" alt="د اسحاق‌زاده شرکت رسمي لوګو" />
-        <div><strong>اسحاق‌زاده</strong><span>آنلاین ډیلیوري</span></div>
-      </div>
-      <button id="logoutBtn" class="icon-btn hidden" aria-label="وتل">↪</button>
+      <div class="brand"><img src="assets/logo.jpeg" alt="لوګو"><div><strong>اسحاق‌زاده</strong><span>آنلاین ډیلیوري</span></div></div>
+      <div class="top-actions"><button id="installBtn" class="install-btn">⬇ نصب</button><button id="logoutBtn" class="icon-btn hidden" aria-label="وتل">↪</button></div>
     </header>
 
     <main>
-      <section id="authView" class="view auth-view active">
-        <div class="hero-card">
-          <span class="eyebrow">چټک • خوندي • منظم</span>
-          <h1>ستاسې ټول آرډرونه،<br><em>په یوه ځای کې</em></h1>
-          <p>د موبایل شمېرې له لارې ننوځئ او خپل ورځني آرډرونه او هفتني راپورونه اداره کړئ.</p>
-        </div>
-        <div class="panel auth-panel">
-          <div class="tabs"><button class="tab active" data-tab="login">ننوتل</button><button class="tab" data-tab="register">نوی ثبت</button></div>
+      <section id="loadingView" class="view active center"><div class="loader"></div><p>اپلیکیشن پرانیستل کېږي...</p></section>
+
+      <section id="authView" class="view auth-view">
+        <div class="hero-card"><span>چټک • خوندي • منظم</span><h1>ستاسې ټول آرډرونه،<br><em>په یوه ځای کې</em></h1><p>د موبایل شمېرې له لارې ننوځئ او خپل آرډرونه او راپورونه اداره کړئ.</p></div>
+        <div class="panel">
+          <div class="tabs"><button class="tab active" data-auth="loginForm">ننوتل</button><button class="tab" data-auth="registerForm">نوی ثبت</button></div>
           <form id="loginForm" class="form active">
-            <label>د موبایل شمېره<input name="phone" inputmode="tel" placeholder="07XX XXX XXX" required /></label>
-            <label>څلور عددي PIN<input name="pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required /></label>
+            <label>د موبایل شمېره<input name="phone" inputmode="tel" placeholder="07XX XXX XXX" required></label>
+            <label>څلور عددي PIN<input name="pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required></label>
             <button class="primary" type="submit">اپلیکیشن ته ننوتل</button>
-            <p class="demo-note">د ازموینې حساب: <b>0700000000</b> — PIN: <b>1234</b></p>
           </form>
           <form id="registerForm" class="form">
-            <label>بشپړ نوم<input name="name" required placeholder="خپل بشپړ نوم" /></label>
-            <label>د موبایل شمېره<input name="phone" inputmode="tel" required placeholder="07XX XXX XXX" /></label>
-            <div class="upload-grid">
-              <label class="upload">د تذکرې عکس<input name="idPhoto" type="file" accept="image/*" capture="environment" required /><span>＋ عکس واخلئ</span></label>
-              <label class="upload">خپله سلفي<input name="selfie" type="file" accept="image/*" capture="user" required /><span>＋ سلفي واخلئ</span></label>
-            </div>
-            <label>څلور عددي PIN<input name="pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" required placeholder="د ځان لپاره PIN" /></label>
+            <label>بشپړ نوم<input name="name" placeholder="خپل بشپړ نوم" required></label>
+            <label>د موبایل شمېره<input name="phone" inputmode="tel" placeholder="07XX XXX XXX" required></label>
+            <label class="upload profile-upload">خپل عکس له ګیلري څخه انتخاب کړئ<input name="profilePhoto" type="file" accept="image/*" required><span>＋ له ګیلري څخه عکس انتخاب کړئ</span></label>
+            <label>څلور عددي PIN<input name="pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="خپل PIN" required></label>
             <button class="primary" type="submit">د تایید لپاره ثبتول</button>
           </form>
         </div>
       </section>
 
-      <section id="pendingView" class="view center-view">
-        <div class="status-orb">✓</div><h2>ستاسې معلومات ثبت شول</h2>
-        <p>حساب مو د اډمین تایید ته استول شوی. له تایید وروسته به اپلیکیشن درته فعال شي.</p>
-        <button class="secondary" onclick="location.reload()">بېرته ننوتلو ته</button>
+      <section id="pendingView" class="view center pending"><div class="status-orb">⌛</div><h2>د تایید په انتظار</h2><p>ستاسې معلومات اډمین ته رسېدلي. له تایید وروسته اپلیکیشن وکاروئ.</p><button id="pendingLogout" class="secondary">وتل</button></section>
+
+      <section id="homeView" class="view page">
+        <div class="welcome"><div><small>ښه راغلاست</small><h2 id="userName">—</h2><span id="roleBadge" class="pill"></span></div><div id="avatar" class="avatar">ا</div></div>
+        <div class="stats"><article><span>د دې هفتې آرډرونه</span><strong id="weekCount">۰</strong><small>ثبت شوي</small></article><article class="gold"><span>ټولې افغانۍ</span><strong id="weekMoney">۰</strong><small>؋ افغانۍ</small></article></div>
+        <div class="section-head"><h3 id="ordersTitle">زما وروستي آرډرونه</h3><button id="newOrderBtn">＋ نوی آرډر</button></div>
+        <div id="ordersList" class="orders"></div><div id="ordersEmpty" class="empty"><span>📦</span><h3>آرډر نشته</h3><p>تر اوسه کوم آرډر نه دی ثبت شوی.</p></div>
       </section>
 
-      <section id="appView" class="view dashboard">
-        <div class="welcome"><div><span>ښه راغلاست</span><h2 id="userName">احمد جان</h2></div><div class="avatar">ا</div></div>
-        <div class="stats">
-          <article><span>د دې هفتې آرډرونه</span><strong id="weekOrders">0</strong><small>ټول ثبت شوي</small></article>
-          <article class="gold"><span>ټولې افغانۍ</span><strong id="weekTotal">۰</strong><small>؋ افغانۍ</small></article>
-        </div>
-        <div class="section-head"><h3>زما وروستي آرډرونه</h3><button id="addOrderTop">＋ نوی آرډر</button></div>
-        <div id="ordersList" class="orders"></div>
-        <div id="emptyState" class="empty"><span>📦</span><h3>تر اوسه آرډر نشته</h3><p>خپل لومړی آرډر همدا اوس ثبت کړئ.</p></div>
+      <section id="adminView" class="view page">
+        <div class="page-title"><div><small>اډمین</small><h2>د شاګردانو تایید</h2></div><span id="pendingCount" class="count">۰</span></div>
+        <div id="pendingUsers" class="users"></div><div id="usersEmpty" class="empty"><span>✓</span><h3>نوی درخواست نشته</h3></div>
+        <div class="section-head"><h3>ټول تایید شوي کسان</h3></div><div id="approvedUsers" class="users"></div>
+      </section>
+
+      <section id="reportView" class="view page">
+        <div class="page-title"><div><small>اوسنۍ هفته</small><h2>هفتنی راپور</h2></div><button id="refreshBtn" class="mini">↻</button></div>
+        <div id="reportSummary" class="report-summary"></div><div id="reportUsers" class="report-users"></div>
       </section>
     </main>
 
     <nav id="bottomNav" class="bottom-nav hidden">
-      <button class="active" data-page="home"><span>⌂</span>کور</button>
-      <button id="addOrderNav" class="add"><span>＋</span></button>
-      <button data-page="report"><span>▥</span>راپور</button>
+      <button class="nav active" data-view="homeView"><span>⌂</span>کور</button>
+      <button id="adminNav" class="nav hidden" data-view="adminView"><span>♙</span>اډمین</button>
+      <button class="nav" data-view="reportView"><span>▥</span>راپور</button>
     </nav>
   </div>
 
-  <dialog id="orderDialog">
-    <form id="orderForm" method="dialog">
-      <div class="dialog-head"><div><small id="dialogKicker">نوی آرډر</small><h2 id="dialogTitle">د جنس معلومات</h2></div><button type="button" id="closeDialog">×</button></div>
-      <input type="hidden" name="id" />
-      <label>د جنس عکس<label class="product-photo"><input name="photo" type="file" accept="image/*" capture="environment" /><img id="photoPreview" alt="د جنس عکس" /><span>📷<b>عکس واخلئ یا یې انتخاب کړئ</b></span></label></label>
-      <label>د جنس نوم<input name="product" required placeholder="مثلاً: نارینه کمیس" /></label>
-      <label>د مشتری شمېره<input name="customerPhone" inputmode="tel" required placeholder="07XX XXX XXX" /></label>
-      <div class="two-cols"><label>ولایت<select name="province" required></select></label><label>تعداد<input name="quantity" type="number" min="1" value="1" required /></label></div>
-      <label>بشپړ ادرس<textarea name="address" required placeholder="ولسوالي، سیمه، کوڅه..."></textarea></label>
-      <label>ټوله بیه (افغانۍ)<input name="price" type="number" min="0" required placeholder="0" /></label>
-      <button class="primary" type="submit">آرډر ثبتول</button>
-    </form>
-  </dialog>
+  <dialog id="orderDialog"><form id="orderForm">
+    <div class="dialog-head"><div><small id="orderKicker">نوی آرډر</small><h2>د جنس معلومات</h2></div><button id="closeOrder" type="button">×</button></div>
+    <input type="hidden" name="id">
+    <label>د جنس عکس<label class="product-photo"><input name="photo" type="file" accept="image/*" capture="environment"><img id="photoPreview" alt="د جنس عکس"><span>📷<b>عکس واخلئ یا انتخاب یې کړئ</b></span></label></label>
+    <label>د جنس نوم<input name="product_name" placeholder="مثلاً: نارینه کمیس" required></label>
+    <label>د مشتری شمېره<input name="customer_phone" inputmode="tel" placeholder="07XX XXX XXX" required></label>
+    <div class="two-cols"><label>ولایت<select name="province" required></select></label><label>تعداد<input name="quantity" type="number" min="1" value="1" required></label></div>
+    <label>بشپړ ادرس<textarea name="address" placeholder="ولسوالي، سیمه، کوڅه..." required></textarea></label>
+    <label>ټوله بیه (افغانۍ)<input name="price" type="number" min="0" required></label>
+    <button class="primary" type="submit">آرډر ثبتول</button>
+  </form></dialog>
+  <dialog id="installDialog" class="install-dialog"><div><button id="closeInstall" class="dialog-x">×</button><div class="install-icon">⬇</div><h2>اپلیکیشن نصب کړئ</h2><p>په iPhone کې د Safari د Share نښه ووهئ، بیا <b>Add to Home Screen</b> انتخاب کړئ.</p><button id="installOk" class="primary">سمه ده</button></div></dialog>
   <div id="toast" class="toast"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
 </body>
 </html>
