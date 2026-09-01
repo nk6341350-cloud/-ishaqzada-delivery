@@ -31,6 +31,7 @@
             <label>د موبایل شمېره<input name="phone" inputmode="tel" placeholder="07XX XXX XXX" required></label>
             <label>څلور عددي PIN<input name="pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required></label>
             <button class="primary" type="submit">اپلیکیشن ته ننوتل</button>
+            <button id="forgotPinBtn" class="secondary" type="button">PIN مې هېر شوی</button>
           </form>
           <form id="registerForm" class="form">
             <label>بشپړ نوم<input name="name" placeholder="خپل بشپړ نوم" required></label>
@@ -73,7 +74,7 @@
   <dialog id="orderDialog"><form id="orderForm">
     <div class="dialog-head"><div><small id="orderKicker">نوی آرډر</small><h2>د جنس معلومات</h2></div><button id="closeOrder" type="button">×</button></div>
     <input type="hidden" name="id">
-    <label>د جنس عکس<label class="product-photo"><input name="photo" type="file" accept="image/*" capture="environment"><img id="photoPreview" alt="د جنس عکس"><span>📷<b>عکس واخلئ یا انتخاب یې کړئ</b></span></label></label>
+    <label>د جنس عکس<label class="product-photo"><input name="photo" type="file" accept="image/*"><img id="photoPreview" alt="د جنس عکس"><span>🖼️<b>له ګیلري څخه عکس انتخاب کړئ</b></span></label></label>
     <label>د جنس نوم<input name="product_name" placeholder="مثلاً: نارینه کمیس" required></label>
     <label>د مشتری شمېره<input name="customer_phone" inputmode="tel" placeholder="07XX XXX XXX" required></label>
     <div class="two-cols"><label>ولایت<select name="province" required></select></label><label>تعداد<input name="quantity" type="number" min="1" value="1" required></label></div>
@@ -82,6 +83,8 @@
     <button class="primary" type="submit">آرډر ثبتول</button>
   </form></dialog>
   <dialog id="installDialog" class="install-dialog"><div><button id="closeInstall" class="dialog-x">×</button><div class="install-icon">⬇</div><h2>اپلیکیشن نصب کړئ</h2><p>په iPhone کې د Safari د Share نښه ووهئ، بیا <b>Add to Home Screen</b> انتخاب کړئ.</p><button id="installOk" class="primary">سمه ده</button></div></dialog>
+  <dialog id="forgotPinDialog" class="install-dialog"><div><button id="closeForgotPin" class="dialog-x" type="button">×</button><div class="install-icon">☎</div><h2>PIN مو هېر شوی؟</h2><p>له اډمین سره په <b>0700426319</b> اړیکه ونیسئ. اډمین به درته نوی څلور عددي PIN وټاکي.</p><button id="forgotPinOk" class="primary" type="button">سمه ده</button></div></dialog>
+  <dialog id="resetPinDialog"><form id="resetPinForm"><div class="dialog-head"><div><small>اډمین</small><h2>نوی PIN ټاکل</h2></div><button id="closeResetPin" type="button">×</button></div><input type="hidden" name="uid"><p id="resetPinUser"></p><label>نوی څلور عددي PIN<input name="pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="مثلاً 1234" required></label><button class="primary" type="submit">PIN بدلول</button></form></dialog>
   <div id="toast" class="toast"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
