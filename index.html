@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/logo.jpeg">
   <link rel="apple-touch-icon" href="assets/logo.jpeg">
-  <link rel="stylesheet" href="styles.css?v=6">
+  <link rel="stylesheet" href="styles.css?v=9">
   <style>.top-actions{display:flex;align-items:center;gap:7px}.install-btn{border:1px solid #dcc38d;background:#fff8e9;color:#8a630f;border-radius:12px;padding:10px 11px;font:700 12px Tahoma}.profile-upload{display:flex!important;min-height:95px;align-items:center;justify-content:center;margin-bottom:14px!important}.install-dialog{border-radius:24px!important;margin:auto!important;padding:0!important}.install-dialog>div{padding:26px;text-align:center;position:relative}.dialog-x{position:absolute;left:15px;top:15px;border:0;background:#edf1f5;width:38px;height:38px;border-radius:12px;font-size:22px}.install-icon{width:74px;height:74px;margin:10px auto 18px;border-radius:22px;display:grid;place-items:center;background:#edf3f9;color:#082a52;font-size:30px}.install-dialog p{color:#748196;line-height:1.9;margin-bottom:20px}</style>
   <style>.avatar{overflow:hidden;position:relative}.avatar img{display:none;width:100%;height:100%;object-fit:cover}.avatar.has-photo img{display:block}.avatar.has-photo span{display:none}.user-identity{display:flex;align-items:center;gap:10px}.user-photo{width:48px;height:48px;border-radius:13px;object-fit:cover;background:#edf2f7;border:1px solid #e2e7ec}</style>
   <title>اسحاق‌زاده آنلاین ډیلیوري</title>
@@ -47,13 +47,13 @@
 
       <section id="homeView" class="view page">
         <div class="welcome"><div><small>ښه راغلاست</small><h2 id="userName">—</h2><span id="roleBadge" class="pill"></span></div><div id="avatar" class="avatar"><img id="avatarImg" alt="شخصي عکس"><span id="avatarFallback">ا</span></div></div>
-        <div class="stats"><article><span>د دې هفتې آرډرونه</span><strong id="weekCount">۰</strong><small>ثبت شوي</small></article><article class="gold"><span>ټولې افغانۍ</span><strong id="weekMoney">۰</strong><small>؋ افغانۍ</small></article></div>
+        <div class="stats"><article><span>د دې هفتې جنسونه</span><strong id="weekCount">0</strong><small>ټول ثبت شوي</small></article><article class="gold"><span>د هفتې ټولې پیسې</span><strong id="weekMoney">0</strong><small>؋ افغانۍ</small></article><article class="emerald"><span>کندهار تسلیم شوي</span><strong id="kandaharDelivered">0</strong><small>د دې هفتې</small></article></div>
         <div class="section-head"><h3 id="ordersTitle">زما وروستي آرډرونه</h3><button id="newOrderBtn">＋ نوی آرډر</button></div>
         <div id="ordersList" class="orders"></div><div id="ordersEmpty" class="empty"><span>📦</span><h3>آرډر نشته</h3><p>تر اوسه کوم آرډر نه دی ثبت شوی.</p></div>
       </section>
 
       <section id="adminView" class="view page">
-        <div class="page-title"><div><small>اډمین</small><h2>د شاګردانو تایید</h2></div><span id="pendingCount" class="count">۰</span></div>
+        <div class="page-title"><div><small>اډمین</small><h2>د شاګردانو تایید</h2></div><span id="pendingCount" class="count">0</span></div>
         <div id="pendingUsers" class="users"></div><div id="usersEmpty" class="empty"><span>✓</span><h3>نوی درخواست نشته</h3></div>
         <div class="section-head"><h3>ټول تایید شوي کسان</h3></div><div id="approvedUsers" class="users"></div>
       </section>
@@ -87,6 +87,6 @@
   <dialog id="resetPinDialog"><form id="resetPinForm"><div class="dialog-head"><div><small>اډمین</small><h2>نوی PIN ټاکل</h2></div><button id="closeResetPin" type="button">×</button></div><input type="hidden" name="uid"><p id="resetPinUser"></p><label>نوی څلور عددي PIN<input name="pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="مثلاً 1234" required></label><button class="primary" type="submit">PIN بدلول</button></form></dialog>
   <div id="toast" class="toast"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>
