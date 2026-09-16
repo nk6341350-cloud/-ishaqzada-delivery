@@ -59,8 +59,30 @@ function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;',
 function errorText(e){const m=e?.message||String(e);if(m.includes('already registered'))return 'دا موبایل شمېره مخکې ثبت شوې';if(m.includes('row-level security'))return 'اجازه نشته؛ د اډمین سره اړیکه ونیسئ';return m}
 function loginErrorText(e){const m=e?.message||String(e);if(/rate limit|too many/i.test(m))return 'ډېرې هڅې وشوې؛ لږ انتظار وکړئ او بیا هڅه وکړئ';if(/email not confirmed/i.test(m))return 'حساب لا تایید شوی نه دی: '+m;return 'د ننوتلو اصلي خطا: '+m}
 let installPrompt=null;
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e});
-$('#installBtn').onclick=async()=>{if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;return}$('#installDialog').showModal()};
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  installPrompt=e;
+});
+window.addEventListener('appinstalled',()=>{
+  installPrompt=null;
+  $('#installBtn').classList.add('hidden');
+});
+$('#installBtn').onclick=async()=>{
+  if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone){
+    $('#installBtn').classList.add('hidden');
+    return;
+  }
+  if(installPrompt){
+    const promptEvent=installPrompt;
+    installPrompt=null;
+    await promptEvent.prompt();
+    await promptEvent.userChoice;
+    return;
+  }
+  const isiPhone=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if(isiPhone)$('#installDialog').showModal();
+  else toast('د نصب کړکۍ لا چمتو نه ده؛ پاڼه یو ځل تازه کړئ او بیا نصب ووهئ');
+};
 $('#closeInstall').onclick=$('#installOk').onclick=()=>$('#installDialog').close();
 $('#forgotPinBtn').onclick=()=>$('#forgotPinDialog').showModal();
 $('#closeForgotPin').onclick=$('#forgotPinOk').onclick=()=>$('#forgotPinDialog').close();
