@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/logo.jpeg">
   <link rel="apple-touch-icon" href="assets/logo.jpeg">
-  <link rel="stylesheet" href="styles.css?v=15">
+  <link rel="stylesheet" href="styles.css?v=16">
   <style>.top-actions{display:flex;align-items:center;gap:7px}.install-btn{border:1px solid #dcc38d;background:#fff8e9;color:#8a630f;border-radius:12px;padding:10px 11px;font:700 12px Tahoma}.profile-upload{display:flex!important;min-height:95px;align-items:center;justify-content:center;margin-bottom:14px!important}.install-dialog{border-radius:24px!important;margin:auto!important;padding:0!important}.install-dialog>div{padding:26px;text-align:center;position:relative}.dialog-x{position:absolute;left:15px;top:15px;border:0;background:#edf1f5;width:38px;height:38px;border-radius:12px;font-size:22px}.install-icon{width:74px;height:74px;margin:10px auto 18px;border-radius:22px;display:grid;place-items:center;background:#edf3f9;color:#082a52;font-size:30px}.install-dialog p{color:#748196;line-height:1.9;margin-bottom:20px}</style>
   <style>.avatar{overflow:hidden;position:relative}.avatar img{display:none;width:100%;height:100%;object-fit:cover}.avatar.has-photo img{display:block}.avatar.has-photo span{display:none}.user-identity{display:flex;align-items:center;gap:10px}.user-photo{width:48px;height:48px;border-radius:13px;object-fit:cover;background:#edf2f7;border:1px solid #e2e7ec}</style>
   <title>اسحاق‌زاده آنلاین ډیلیوري</title>
@@ -27,9 +27,9 @@
         <div class="hero-card"><span>چټک • خوندي • منظم</span><h1>ستاسې ټول آرډرونه،<br><em>په یوه ځای کې</em></h1><p>د موبایل شمېرې له لارې ننوځئ او خپل آرډرونه او راپورونه اداره کړئ.</p></div>
         <div class="panel">
           <div class="tabs"><button class="tab active" data-auth="loginForm">ننوتل</button><button class="tab" data-auth="registerForm">نوی ثبت</button></div>
-          <form id="loginForm" class="form active">
+          <form id="loginForm" class="form active" novalidate>
             <label>د موبایل شمېره<input name="phone" inputmode="tel" placeholder="07XX XXX XXX" required></label>
-            <label>څلور عددي PIN<input name="pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required></label>
+            <label>څلور عددي PIN<input name="pin" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="current-password" required></label>
             <button class="primary" type="submit">اپلیکیشن ته ننوتل</button>
             <button id="forgotPinBtn" class="secondary" type="button">PIN مې هېر شوی</button>
           </form>
@@ -89,24 +89,19 @@
 
 <script>
 (function(){
-  var finished=false;
   function recover(){
-    if(finished) return;
-    var loading=document.getElementById('loadingView');
-    var auth=document.getElementById('authView');
+    var loading=document.getElementById('loadingView'), auth=document.getElementById('authView');
     if(loading && loading.classList.contains('active') && auth){
-      loading.classList.remove('active');
-      auth.classList.add('active');
+      loading.classList.remove('active'); auth.classList.add('active');
     }
   }
-  window.addEventListener('error', function(){ setTimeout(recover,100); });
-  window.addEventListener('unhandledrejection', function(){ setTimeout(recover,100); });
+  window.addEventListener('error',function(){setTimeout(recover,100)});
+  window.addEventListener('unhandledrejection',function(){setTimeout(recover,100)});
   setTimeout(recover,15000);
-  window.__ishaqzadaBootFinished=function(){finished=true;};
 })();
 </script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js?v=15"></script>
+  <script src="app.js?v=16"></script>
 </body>
 </html>

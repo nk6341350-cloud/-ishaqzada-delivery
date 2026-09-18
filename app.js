@@ -13,6 +13,57 @@ function busy(form,on){const b=form.querySelector('button[type=submit]');if(b)b.
 function phone(v){let p=(v||'').replace(/\D/g,'');if(p.startsWith('0093'))p='0'+p.slice(4);else if(p.startsWith('93'))p='0'+p.slice(2);if(p.length===9&&!p.startsWith('0'))p='0'+p;return p}
 function emailFor(p){return `${p}@ishaqzada.delivery`}
 function passwordFor(p,pin){return `IFC!${pin}${p.slice(-2)}`}
+
+/* Login compatibility fix for old/new Android + iPhone.
+   No orders, reports, admin, registration, database schema, or PIN values are changed. */
+function loginDigits(v){
+  return String(v == null ? '' : v)
+    .replace(/[۰-۹]/g,function(c){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(c)})
+    .replace(/[٠-٩]/g,function(c){return '٠١٢٣٤٥٦٧٨٩'.indexOf(c)})
+    .replace(/\s+/g,'');
+}
+function loginPhone(v){ return phone(loginDigits(v)); }
+
+function authLoginXHR(email,password){
+  return new Promise(function(resolve,reject){
+    try{
+      var x=new XMLHttpRequest();
+      x.open('POST',SUPABASE_URL+'/auth/v1/token?grant_type=password',true);
+      x.setRequestHeader('Content-Type','application/json;charset=UTF-8');
+      x.setRequestHeader('apikey',SUPABASE_KEY);
+      x.timeout=15000;
+      x.onreadystatechange=function(){
+        if(x.readyState!==4)return;
+        var body={};
+        try{body=JSON.parse(x.responseText||'{}')}catch(_){}
+        if(x.status>=200&&x.status<300)return resolve(body);
+        reject(new Error(body.msg||body.message||body.error_description||body.error||('HTTP '+x.status)));
+      };
+      x.onerror=function(){reject(new Error('Network request failed'))};
+      x.ontimeout=function(){reject(new Error('Network timeout'))};
+      x.send(JSON.stringify({email:email,password:password}));
+    }catch(err){reject(err)}
+  });
+}
+async function compatibleLogin(p,pin){
+  var email=emailFor(p), password=passwordFor(p,pin);
+  try{
+    var result=await Promise.race([
+      db.auth.signInWithPassword({email:email,password:password}),
+      new Promise(function(_,reject){setTimeout(function(){reject(new Error('Network timeout'))},12000)})
+    ]);
+    if(result && !result.error && result.data && result.data.session)return result.data;
+    if(result && result.error && !/network|fetch|timeout/i.test(result.error.message||''))throw result.error;
+  }catch(err){
+    if(!/network|fetch|timeout|load/i.test(err.message||String(err)))throw err;
+  }
+  var raw=await authLoginXHR(email,password);
+  if(!raw.access_token || !raw.refresh_token)throw new Error('Login session not returned');
+  var set=await db.auth.setSession({access_token:raw.access_token,refresh_token:raw.refresh_token});
+  if(set.error)throw set.error;
+  return set.data;
+}
+
 function ext(file){return (file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')}
 function weekDate(value=new Date()){const d=new Date(value);const day=(d.getDay()+1)%7;d.setHours(0,0,0,0);d.setDate(d.getDate()-day);return d}
 function weekStart(){return weekDate().toISOString()}
@@ -28,7 +79,23 @@ provinces.forEach(p=>$('#orderForm select').add(new Option(p,p)));
 
 $('#registerForm').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget,f=new FormData(form),p=phone(f.get('phone')),pin=f.get('pin');if(!/^07\d{8}$/.test(p))return toast('د موبایل شمېره سمه ولیکئ');busy(form,true);try{const {data,error}=await db.auth.signUp({email:emailFor(p),password:passwordFor(p,pin),options:{data:{full_name:f.get('name').trim(),phone:p}}});if(error)throw error;if(!data.session)throw new Error('د Email confirmation بندول پکار دي');session=data.session;const uid=data.user.id,photo=f.get('profilePhoto'),photoPath=`${uid}/profile.${ext(photo)}`;const up=await db.storage.from('identity-docs').upload(photoPath,photo,{upsert:true});if(up.error)throw up.error;const {error:rpcError}=await db.rpc('set_my_identity_paths',{p_tazkira_path:null,p_selfie_path:photoPath});if(rpcError)throw rpcError;profile=await getProfile();route()}catch(err){toast(errorText(err))}finally{busy(form,false)}};
 
-$('#loginForm').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget,f=new FormData(form),p=phone(f.get('phone'));busy(form,true);try{const {data,error}=await db.auth.signInWithPassword({email:emailFor(p),password:passwordFor(p,f.get('pin'))});if(error)throw error;session=data.session;profile=await getProfile();route()}catch(err){toast(loginErrorText(err))}finally{busy(form,false)}};
+$('#loginForm').onsubmit=async e=>{
+  e.preventDefault();
+  const form=e.currentTarget;
+  const phoneInput=form.elements['phone'], pinInput=form.elements['pin'];
+  const p=loginPhone(phoneInput.value), pin=loginDigits(pinInput.value);
+  phoneInput.value=p; pinInput.value=pin;
+  if(!/^07\d{8}$/.test(p))return toast('د موبایل شمېره سمه ولیکئ');
+  if(!/^\d{4}$/.test(pin))return toast('څلور عددي PIN ولیکئ');
+  busy(form,true);
+  try{
+    const data=await compatibleLogin(p,pin);
+    session=data.session;
+    profile=await getProfile();
+    route();
+  }catch(err){toast(loginErrorText(err))}
+  finally{busy(form,false)}
+};
 $('#logoutBtn').onclick=$('#pendingLogout').onclick=async()=>{await db.auth.signOut();session=null;profile=null;$('#bottomNav').classList.add('hidden');$('#logoutBtn').classList.add('hidden');show('authView')};
 
 async function getProfile(){const uid=session?.user?.id;if(!uid)throw new Error('حساب ونه موندل شو');const {data,error}=await db.from('profiles').select('*').eq('id',uid).single();if(error)throw error;return data}
@@ -88,4 +155,4 @@ $('#forgotPinBtn').onclick=()=>$('#forgotPinDialog').showModal();
 $('#closeForgotPin').onclick=$('#forgotPinOk').onclick=()=>$('#forgotPinDialog').close();
 if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone)$('#installBtn').classList.add('hidden');
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
-boot().then(function(){if(window.__ishaqzadaBootFinished)window.__ishaqzadaBootFinished();}).catch(function(){show('authView')});
+boot();
