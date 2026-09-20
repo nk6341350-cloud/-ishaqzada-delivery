@@ -81,6 +81,7 @@
     <label>بشپړ ادرس<textarea name="address" placeholder="ولسوالي، سیمه، کوڅه..." required></textarea></label>
     <label>ټوله بیه (افغانۍ)<input name="price" type="number" min="0" required></label>
     <button class="primary" type="submit">آرډر ثبتول</button>
+    <button id="deleteOrderBtn" type="button" class="secondary hidden" style="margin-top:10px;color:#b42318">جنس ډیلیټ کړئ</button>
   </form></dialog>
   <dialog id="installDialog" class="install-dialog"><div><button id="closeInstall" class="dialog-x">×</button><div class="install-icon">⬇</div><h2>اپلیکیشن نصب کړئ</h2><p>په iPhone کې د Safari د Share نښه ووهئ، بیا <b>Add to Home Screen</b> انتخاب کړئ.</p><button id="installOk" class="primary">سمه ده</button></div></dialog>
   <dialog id="forgotPinDialog" class="install-dialog"><div><button id="closeForgotPin" class="dialog-x" type="button">×</button><div class="install-icon">☎</div><h2>PIN مو هېر شوی؟</h2><p>له اډمین سره په <b>0700426319</b> اړیکه ونیسئ. اډمین به درته نوی څلور عددي PIN وټاکي.</p><button id="forgotPinOk" class="primary" type="button">سمه ده</button></div></dialog>
@@ -102,6 +103,6 @@
 </script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js?v=17"></script>
+  <script src="app.js?v=18"></script>
 </body>
 </html>
