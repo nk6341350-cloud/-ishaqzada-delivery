@@ -37,7 +37,7 @@
           <form id="registerForm" class="form">
             <label>بشپړ نوم<input name="name" placeholder="خپل بشپړ نوم" required></label>
             <label>د موبایل شمېره<input name="phone" inputmode="tel" placeholder="07XX XXX XXX" required></label>
-            <label class="upload profile-upload">خپل عکس له ګیلري څخه انتخاب کړئ<input name="profilePhoto" type="file" accept="image/*" required><span>＋ له ګیلري څخه عکس انتخاب کړئ</span></label>
+            
             <label>څلور عددي PIN<input name="pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="خپل PIN" required></label>
             <button class="primary" type="submit">د تایید لپاره ثبتول</button>
           </form>
@@ -49,7 +49,7 @@
       <section id="pendingView" class="view center pending"><div class="status-orb">⌛</div><h2>د تایید په انتظار</h2><p>ستاسې معلومات اډمین ته رسېدلي. له تایید وروسته اپلیکیشن وکاروئ.</p><button id="pendingLogout" class="secondary">وتل</button></section>
 
       <section id="homeView" class="view page">
-        <div class="welcome"><div><small>ښه راغلاست</small><h2 id="userName">—</h2><span id="roleBadge" class="pill"></span></div><div class="avatar-action"><div id="avatar" class="avatar"><img id="avatarImg" alt="شخصي عکس"><span id="avatarFallback">ا</span></div><button id="changeProfilePhoto" type="button">عکس بدلول</button><input id="profilePhotoInput" type="file" accept="image/*" aria-label="د پروفایل عکس غوره کړئ" hidden></div></div>
+        <div class="welcome"><div><small>ښه راغلاست</small><h2 id="userName">—</h2><span id="roleBadge" class="pill"></span></div><div class="avatar-action"><div id="avatar" class="avatar"><span id="avatarFallback">ا</span></div></div></div>
         <div class="stats split-stats"><article class="other-provinces"><span>نن نورو ولایتونو ته</span><strong><b id="otherProvinceCount">0</b> جنسونه</strong><small><b id="otherProvinceMoney">0</b> ؋ افغانۍ</small></article><article class="emerald kandahar-stat"><span>نن کندهار کې</span><strong><b id="kandaharCount">0</b> جنسونه</strong><small><b id="kandaharMoney">0</b> ؋ افغانۍ</small></article></div>
         <div class="section-head"><h3 id="ordersTitle">زما وروستي آرډرونه</h3><button id="newOrderBtn">＋ نوی آرډر</button></div>
         <div id="ordersList" class="orders"></div><button id="moreOrdersBtn" class="secondary hidden more-orders" type="button">نور آرډرونه ښکاره کړئ</button><div id="ordersEmpty" class="empty"><span>📦</span><h3>آرډر نشته</h3><p>تر اوسه کوم آرډر نه دی ثبت شوی.</p></div>

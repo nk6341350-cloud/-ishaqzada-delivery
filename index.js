@@ -1,9 +1,3 @@
 import { handleApi } from './delivery-api.js';
-
-export default {
-  async fetch(request, env) {
-    const path = new URL(request.url).pathname;
-    if (path.startsWith('/api/')) return handleApi(request, env, path);
-    return env.ASSETS.fetch(request);
-  },
-};
+const cors=(req,res)=>{const h=new Headers(res.headers);h.set('Access-Control-Allow-Origin',req.headers.get('Origin')||'*');h.set('Vary','Origin');h.set('Access-Control-Allow-Headers','Content-Type, Authorization');h.set('Access-Control-Allow-Methods','GET,POST,PATCH,DELETE,OPTIONS');return new Response(res.body,{status:res.status,statusText:res.statusText,headers:h})};
+export default {async fetch(request,env){if(request.method==='OPTIONS')return cors(request,new Response(null,{status:204}));const path=new URL(request.url).pathname;if(path.startsWith('/api/'))return cors(request,await handleApi(request,env,path));return new Response('Ishaqzada Delivery API',{status:200,headers:{'content-type':'text/plain;charset=UTF-8'}})}};
