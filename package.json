@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "migrate": "wrangler d1 migrations apply ishaqzada-delivery-db --remote"
+    "migrate": "wrangler d1 migrations apply ishaqzada-delivery --remote"
   },
   "devDependencies": {
     "wrangler": "^4.0.0"

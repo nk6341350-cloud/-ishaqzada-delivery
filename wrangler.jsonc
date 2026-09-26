@@ -3,5 +3,5 @@
   "name": "ishaqzada-delivery-api",
   "main": "src/index.js",
   "compatibility_date": "2026-09-25",
-  "d1_databases": [{"binding":"DB","database_name":"ishaqzada-delivery","database_id":"REPLACE_WITH_YOUR_D1_DATABASE_ID"}]
+  "d1_databases": [{"binding":"DB","database_name":"ishaqzada-delivery","database_id":"ca7d3745-5159-41a0-9681-ac9aeee8082f"}]
 }
