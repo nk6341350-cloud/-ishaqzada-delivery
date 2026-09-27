@@ -11,6 +11,24 @@
   <link rel="stylesheet" href="styles.css?v=9">
   <style>.top-actions{display:flex;align-items:center;gap:7px}.install-btn{border:1px solid #dcc38d;background:#fff8e9;color:#8a630f;border-radius:12px;padding:10px 11px;font:700 12px Tahoma}.profile-upload{display:flex!important;min-height:95px;align-items:center;justify-content:center;margin-bottom:14px!important}.install-dialog{border-radius:24px!important;margin:auto!important;padding:0!important}.install-dialog>div{padding:26px;text-align:center;position:relative}.dialog-x{position:absolute;left:15px;top:15px;border:0;background:#edf1f5;width:38px;height:38px;border-radius:12px;font-size:22px}.install-icon{width:74px;height:74px;margin:10px auto 18px;border-radius:22px;display:grid;place-items:center;background:#edf3f9;color:#082a52;font-size:30px}.install-dialog p{color:#748196;line-height:1.9;margin-bottom:20px}</style>
   <style>.avatar{overflow:hidden;position:relative}.avatar img{display:none;width:100%;height:100%;object-fit:cover}.avatar.has-photo img{display:block}.avatar.has-photo span{display:none}.user-identity{display:flex;align-items:center;gap:10px}.user-photo{width:48px;height:48px;border-radius:13px;object-fit:cover;background:#edf2f7;border:1px solid #e2e7ec}</style>
+  <style>
+    /* The order list has no image column; let its details use the whole card. */
+    #ordersList .order-card{display:block;min-width:0;padding:0;overflow:hidden;border:1px solid #dce4ea;border-radius:22px;background:#fff;box-shadow:0 12px 30px rgba(8,42,82,.09);transform:none}
+    #ordersList .order-card::before{content:"";display:block;height:4px;background:linear-gradient(90deg,#123a69,#d4ac5e,#123a69)}
+    #ordersList .order-main{min-width:0;width:100%}
+    #ordersList .order-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:17px 17px 14px;background:linear-gradient(135deg,#fff,#f7f9fc);border-bottom:1px solid #edf0f3}
+    #ordersList .order-top h4{flex:1;min-width:0;margin:0;color:#0b2d55;font-size:19px;line-height:1.5;overflow-wrap:anywhere}
+    #ordersList .order-top .badge{flex:none;border-radius:10px;padding:7px 10px;font-size:11px;line-height:1.3;white-space:nowrap}
+    #ordersList .order-meta{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:13px 17px 0;color:#52677e;font-size:13px;line-height:1.7}
+    #ordersList .order-meta span{min-width:0;overflow-wrap:anywhere}
+    #ordersList .order-meta:nth-child(2) span{display:inline-flex;align-items:center;padding:6px 10px;border:1px solid #e5ebf0;border-radius:10px;background:#f5f8fb;color:#2b4661}
+    #ordersList .order-meta:nth-child(3){color:#7b8796;font-size:12px}
+    #ordersList .order-meta:nth-child(4){color:#3e536b}
+    #ordersList .order-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:15px;padding:13px 17px 16px;border-top:1px solid #edf0f3}
+    #ordersList .order-foot strong{color:#0b2d55;font-size:22px;white-space:nowrap}
+    #ordersList .order-actions{flex-wrap:wrap}
+    @media(max-width:380px){#ordersList .order-top{padding:15px}#ordersList .order-meta{padding-right:15px;padding-left:15px}#ordersList .order-foot{padding-right:15px;padding-left:15px}#ordersList .order-top h4{font-size:17px}}
+  </style>
   <title>اسحاق‌زاده آنلاین ډیلیوري</title>
 </head>
 <body>
