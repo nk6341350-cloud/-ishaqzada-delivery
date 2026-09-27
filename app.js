@@ -86,11 +86,7 @@ $('#ownPinForm').onsubmit=async e=>{e.preventDefault();const form=e.currentTarge
 $('#refreshBtn').onclick=loadReport;
 async function loadReport(){try{const d=await api('/report'),rows=d.days,today=rows.find(x=>x.key===businessDayKey())||{otherCount:0,otherMoney:0,kandaharCount:0,kandaharMoney:0};$('#reportSummary').innerHTML=`<article><strong>${number(today.otherCount)} جنس</strong><span>نن نورو ولایتونو ته</span><b>${number(today.otherMoney)} ؋</b></article><article><strong>${number(today.kandaharCount)} جنس</strong><span>نن کندهار کې</span><b>${number(today.kandaharMoney)} ؋</b></article><article><strong>${number(today.otherCount+today.kandaharCount)}</strong><span>نن ټول</span></article>`;$('#reportUsers').innerHTML=rows.map((x,i)=>`<article class="weekly-card"><div class="weekly-title"><div><small>${i===0&&x.key===businessDayKey()?'نن':'ورځ'}</small><h3>${businessDayLabel(x.key)}</h3></div><strong>${number(x.otherCount+x.kandaharCount)} جنس</strong></div><div class="weekly-grid"><span>نور ولایتونه<b>${number(x.otherCount)} • ${number(x.otherMoney)} ؋</b></span><span>کندهار<b>${number(x.kandaharCount)} • ${number(x.kandaharMoney)} ؋</b></span></div></article>`).join('')}catch(e){toast(errorText(e))}}
 
-let deferredInstall=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e});
-$('#installBtn').onclick=async()=>{if(deferredInstall){deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null}else $('#installDialog').showModal()};
-$('#closeInstall').onclick=$('#installOk').onclick=()=>$('#installDialog').close();
 $('#forgotPinBtn').onclick=()=>$('#forgotPinDialog').showModal();$('#closeForgotPin').onclick=$('#forgotPinOk').onclick=()=>$('#forgotPinDialog').close();
-if(matchMedia('(display-mode: standalone)').matches||navigator.standalone)$('#installBtn').classList.add('hidden');
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js');
 async function start(){try{const d=await api('/setup');if(!d.ready){show('setupView');return}}catch(e){toast(errorText(e));show('authView');return}boot()}
 start();

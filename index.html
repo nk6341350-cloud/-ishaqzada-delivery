@@ -5,6 +5,44 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#082a52">
   <meta name="description" content="د اسحاق‌زاده آنلاین ډیلیوري د آرډرونو مدیریت">
+  <script>
+  // Capture the browser's installation offer before application startup.
+  (()=>{
+    let offer=null,installed=false,working=false;
+    const standalone=()=>installed||matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+    function refresh(){
+      const button=document.getElementById('installBtn');
+      if(button)button.classList.toggle('hidden',!!standalone());
+      const action=document.getElementById('installNow');
+      if(action)action.hidden=!offer||!!standalone();
+    }
+    window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();offer=event;refresh()});
+    window.addEventListener('appinstalled',()=>{installed=true;offer=null;document.getElementById('installDialog')?.close();refresh()});
+    document.addEventListener('DOMContentLoaded',()=>{
+      const dialog=document.getElementById('installDialog');
+      const message=dialog.querySelector('p');
+      const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+      message.textContent=ios?'په Safari کې Share ووهئ، بیا Add to Home Screen او Add انتخاب کړئ.':/Android/i.test(navigator.userAgent)?'دا پاڼه په Chrome کې پرانیزئ. که د نصب غوښتنه نه ښکاري، د براوزر له ⋮ مینو څخه Add to Home screen یا Install app انتخاب کړئ. که اپ مخکې نصب وي، د موبایل پر سکرین یې نښه وګورئ.':'د براوزر د نصب نښه یا له مینو څخه Install app انتخاب کړئ.';
+      async function install(){
+        if(working||standalone())return;
+        if(!offer){if(!dialog.open)dialog.showModal();return;}
+        const prompt=offer;offer=null;working=true;refresh();
+        try{
+          await prompt.prompt();
+          const choice=await prompt.userChoice;
+          if(choice.outcome==='accepted')dialog.close();
+        }catch(error){if(!dialog.open)dialog.showModal()}
+        finally{working=false;refresh()}
+      }
+      document.getElementById('installBtn').onclick=install;
+      document.getElementById('installNow').onclick=install;
+      document.getElementById('closeInstall').onclick=document.getElementById('installOk').onclick=()=>dialog.close();
+      const display=matchMedia('(display-mode: standalone)');
+      if(display.addEventListener)display.addEventListener('change',refresh);
+      refresh();
+    });
+  })();
+  </script>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="logo.jpeg">
   <link rel="apple-touch-icon" href="logo.jpeg">
@@ -104,7 +142,7 @@
     <button class="primary" type="submit">آرډر ثبتول</button>
     <button id="deleteOrderBtn" type="button" class="secondary hidden" style="margin-top:10px;color:#b42318">جنس ډیلیټ کړئ</button>
   </form></dialog>
-  <dialog id="installDialog" class="install-dialog"><div><button id="closeInstall" class="dialog-x">×</button><div class="install-icon">⬇</div><h2>اپلیکیشن نصب کړئ</h2><p>په iPhone کې د Safari د Share نښه ووهئ، بیا <b>Add to Home Screen</b> انتخاب کړئ.</p><button id="installOk" class="primary">سمه ده</button></div></dialog>
+  <dialog id="installDialog" class="install-dialog"><div><button id="closeInstall" class="dialog-x">×</button><div class="install-icon">⬇</div><h2>اپلیکیشن نصب کړئ</h2><p>په iPhone کې د Safari د Share نښه ووهئ، بیا <b>Add to Home Screen</b> انتخاب کړئ.</p><button id="installNow" class="primary" hidden>⬇ اوس نصب کړئ</button><button id="installOk" class="primary">سمه ده</button></div></dialog>
   <dialog id="forgotPinDialog" class="install-dialog"><div><button id="closeForgotPin" class="dialog-x" type="button">×</button><div class="install-icon">☎</div><h2>PIN مو هېر شوی؟</h2><p>له خپل اډمین سره اړیکه ونیسئ. اډمین به درته نوی څلور عددي PIN وټاکي.</p><button id="forgotPinOk" class="primary" type="button">سمه ده</button></div></dialog>
   <dialog id="ownPinDialog"><form id="ownPinForm"><div class="dialog-head"><div><small>امنیت</small><h2>زما PIN بدلول</h2></div><button id="closeOwnPin" type="button">×</button></div><label>اوسنی PIN<input name="oldPin" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" required></label><label>نوی PIN<input name="newPin" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" required></label><button class="primary" type="submit">PIN بدلول</button></form></dialog>
   <dialog id="resetPinDialog"><form id="resetPinForm"><div class="dialog-head"><div><small>اډمین</small><h2>نوی PIN ټاکل</h2></div><button id="closeResetPin" type="button">×</button></div><input type="hidden" name="uid"><p id="resetPinUser"></p><label>نوی څلور عددي PIN<input name="pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="مثلاً 1234" required></label><button class="primary" type="submit">PIN بدلول</button></form></dialog>
@@ -125,6 +163,6 @@
 </script>
 
   <script src="config.js?v=9"></script>
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>
