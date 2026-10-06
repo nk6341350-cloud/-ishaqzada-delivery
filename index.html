@@ -107,7 +107,7 @@
       <section id="homeView" class="view page">
         <div class="welcome"><div><small>ښه راغلاست</small><h2 id="userName">—</h2><span id="roleBadge" class="pill"></span></div><div class="avatar-action"><div id="avatar" class="avatar"><span id="avatarFallback">ا</span></div></div></div>
         <button id="changeOwnPin" class="secondary" type="button">زما PIN بدلول</button>
-        <div class="stats split-stats"><article class="other-provinces"><span>نن نورو ولایتونو ته</span><strong><b id="otherProvinceCount">0</b> جنسونه</strong><small><b id="otherProvinceMoney">0</b> ؋ افغانۍ</small></article><article class="emerald kandahar-stat"><span>نن کندهار کې</span><strong><b id="kandaharCount">0</b> جنسونه</strong><small><b id="kandaharMoney">0</b> ؋ افغانۍ</small></article></div>
+        <div class="stats split-stats"><article class="other-provinces"><span>نن نورو ولایتونو ته</span><strong><b id="otherProvinceCount">0</b> جنسونه</strong><small><b id="otherProvinceMoney">0</b> ؋ افغانۍ</small></article><article class="emerald kandahar-stat"><span id="localDeliveryTitle">نن کندهار کې</span><strong><b id="kandaharCount">0</b> جنسونه</strong><small><b id="kandaharMoney">0</b> ؋ افغانۍ</small></article></div>
         <div class="section-head"><h3 id="ordersTitle">زما وروستي آرډرونه</h3><button id="newOrderBtn">＋ نوی آرډر</button></div>
         <div id="ordersList" class="orders"></div><button id="moreOrdersBtn" class="secondary hidden more-orders" type="button">نور آرډرونه ښکاره کړئ</button><div id="ordersEmpty" class="empty"><span>📦</span><h3>آرډر نشته</h3><p>تر اوسه کوم آرډر نه دی ثبت شوی.</p></div>
       </section>
@@ -136,6 +136,7 @@
     <input type="hidden" name="id">
     <label>د جنس نوم<input name="product_name" placeholder="مثلاً: نارینه کمیس" required></label>
     <label>د مشتری شمېره<input name="customer_phone" inputmode="tel" placeholder="07XX XXX XXX" required></label>
+    <label>لېږدونکی<select name="dispatch_branch" required><option value="kandahar">د کندهار لېږدونکی</option><option value="kabul">د کابل لېږدونکی</option></select></label>
     <div class="two-cols"><label>ولایت<select name="province" required></select></label><label>تعداد<input name="quantity" type="number" min="1" value="1" required></label></div>
     <label>بشپړ ادرس<textarea name="address" placeholder="ولسوالي، سیمه، کوڅه..." required></textarea></label>
     <label>ټوله بیه (افغانۍ)<input name="price" type="number" min="0" required></label>
@@ -163,6 +164,7 @@
 </script>
 
   <script src="config.js?v=9"></script>
-  <script src="app.js?v=10"></script>
+  <script src="app.js?v=11"></script>
 </body>
 </html>
+
