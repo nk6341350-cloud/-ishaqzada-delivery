@@ -136,7 +136,48 @@
   <dialog id="orderDialog"><form id="orderForm">
     <div class="dialog-head"><div><small id="orderKicker">نوی آرډر</small><h2>د جنس معلومات</h2></div><button id="closeOrder" type="button">×</button></div>
     <input type="hidden" name="id">
-    <label>د جنس نوم<input name="product_name" placeholder="مثلاً: نارینه کمیس" required></label>
+    <label>د جنس نوم<select name="product_name" required>
+      <option value="" selected disabled>د جنس نوم وټاکئ</option>
+      <option>کارټ فلس کپسول او تیل</option>
+      <option>فلس کیئر کپسول</option>
+      <option>سیون ايپیکټ چای بوتل والا</option>
+      <option>سیون ايپیکټ چای پایکټ والا</option>
+      <option>ریګل کپسول</option>
+      <option>شوګرسټاپ کپسول</option>
+      <option>ویګټ ګسن کپسول</option>
+      <option>ظاهرشمپو اوتیل</option>
+      <option>سټومچ کپسول</option>
+      <option>معجون خاص</option>
+      <option>معجون نیرو فورټ</option>
+      <option>معجون ویټالټي</option>
+      <option>معجون ویګټ ګین</option>
+      <option>معجون استوکیر</option>
+      <option>رومیکس کریم</option>
+      <option>کارټ فلس کپسول</option>
+      <option>کارټ فلس تیل</option>
+      <option>ډیرمیکن سیرم</option>
+      <option>فیس کیئرکیریم</option>
+      <option>زارا 4n1 کریم</option>
+      <option>فروفیشنل کریم فیس واش</option>
+      <option>فیرفیکټ مین کپسول</option>
+      <option>سوین ایپیکټ سیرم</option>
+      <option>رومیکس فالش</option>
+      <option>ظاهر دغاښو فوډر</option>
+      <option>رومیکس دغاښو فوډر</option>
+      <option>هارټ فلس کپسول</option>
+      <option>سایډونیک سیرم او کریم</option>
+      <option>کرسټل رنک</option>
+      <option>فروفیشنل رنګ</option>
+      <option>سیون ايپیکټ تیل</option>
+      <option>ګسټرو کیئر کپسول</option>
+      <option>ریلیر کیئر کپسول</option>
+      <option>پیټ کیئر کپسول</option>
+      <option>ریکیو کیئر کپسول</option>
+      <option>ګین کیئر کپسول</option>
+      <option>رینل کیئر کپسول</option>
+      <option>لیویر کیئر کپسول</option>
+      <option>شوګر کیئر کپسول</option>
+    </select></label>
     <label>د مشتری شمېره<input name="customer_phone" inputmode="tel" placeholder="07XX XXX XXX" required></label>
     <label>لېږدونکی<select name="dispatch_branch" required><option value="kandahar">د کندهار لېږدونکی</option><option value="kabul">د کابل لېږدونکی</option></select></label>
     <div class="two-cols"><label>ولایت<select name="province" required></select></label><label>تعداد<input name="quantity" type="number" min="1" value="1" required></label></div>
@@ -166,7 +207,7 @@
 </script>
 
   <script src="config.js?v=9"></script>
-  <script src="app.js?v=12"></script>
+  <script src="app.js?v=13"></script>
 </body>
 </html>
 
