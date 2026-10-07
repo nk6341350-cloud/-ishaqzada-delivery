@@ -8,10 +8,14 @@ const userRoleLabel=u=>u.role==='dispatcher'?'د '+branchCity(u)+' لېږدون�
 const statusNames={registered:'ثبت شوی',sent:'ولېږل شو',delivered:'تسلیم شو'};
 let profile=null,currentOrders=[],ordersOffset=0,hasMoreOrders=false;
 const ORDER_PAGE_SIZE=20;
+let agentReportBranch='kandahar';
 let adminBranch='all',ordersRequest=0,statsRequest=0,reportRequest=0,inventoryRequest=0;
 const adminBranchQuery=()=>profile?.role==='admin'?'admin_branch='+adminBranch:'';
 function setupAdminBranchFilters(){
   adminBranch='all';
+  agentReportBranch='kandahar';
+  $('#agentReportFilter').classList.toggle('hidden',profile.role!=='agent');
+  $('#agentReportBranch').value=agentReportBranch;
   $$('.admin-branch-filter').forEach(el=>el.classList.toggle('hidden',profile.role!=='admin'));
   $$('[data-admin-branch]').forEach(el=>{el.value=adminBranch;el.onchange=()=>{
     adminBranch=el.value;
@@ -57,6 +61,7 @@ async function api(path,opts={}){
   if(query.has('offset'))payload.offset=Number(query.get('offset'));
   if(query.has('limit'))payload.limit=Number(query.get('limit'));
   if(query.has('admin_branch'))payload.admin_branch=query.get('admin_branch');
+  if(query.has('report_branch'))payload.report_branch=query.get('report_branch');
   if(opts.body instanceof FormData)Object.assign(payload,Object.fromEntries(opts.body.entries()));
   else if(opts.body)Object.assign(payload,JSON.parse(opts.body));
   const key=config.publishableKey,token=localStorage.getItem('ishaqzada_token')||'';
@@ -132,8 +137,9 @@ $('#changeOwnPin').onclick=()=>$('#ownPinDialog').showModal();
 $('#closeOwnPin').onclick=()=>$('#ownPinDialog').close();
 $('#ownPinForm').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget,f=new FormData(form),oldPin=digits(f.get('oldPin')),newPin=digits(f.get('newPin'));if(!/^\d{4}$/.test(oldPin)||!/^\d{4}$/.test(newPin))return toast('څلور عددي PIN ولیکئ');busy(form,true);try{await api('/me/pin',{method:'PATCH',body:JSON.stringify({oldPin,newPin})});form.reset();$('#ownPinDialog').close();localStorage.removeItem('ishaqzada_token');profile=null;$('#bottomNav').classList.add('hidden');$('#logoutBtn').classList.add('hidden');show('authView');toast('PIN بدل شو؛ بیا ننوځئ')}catch(err){toast(errorText(err))}finally{busy(form,false)}};
 
+$('#agentReportBranch').onchange=e=>{agentReportBranch=e.target.value;$('#reportSummary').innerHTML='';$('#reportUsers').innerHTML='';loadReport()};
 $('#refreshBtn').onclick=loadReport;
-async function loadReport(){const request=++reportRequest;try{const d=await api('/report?'+adminBranchQuery());if(request!==reportRequest)return;const rows=d.days,today=rows.find(x=>x.key===businessDayKey())||{otherCount:0,otherMoney:0,kandaharCount:0,kandaharMoney:0};$('#reportSummary').innerHTML=`<article><strong>${number(today.otherCount)} جنس</strong><span>نن نورو ولایتونو ته</span><b>${number(today.otherMoney)} ؋</b></article><article><strong>${number(today.kandaharCount)} جنس</strong><span>نن ${localDeliveryLabel()} کې</span><b>${number(today.kandaharMoney)} ؋</b></article><article><strong>${number(today.otherCount+today.kandaharCount)}</strong><span>نن ټول</span></article>`;$('#reportUsers').innerHTML=rows.map((x,i)=>`<article class="weekly-card"><div class="weekly-title"><div><small>${i===0&&x.key===businessDayKey()?'نن':'ورځ'}</small><h3>${businessDayLabel(x.key)}</h3></div><strong>${number(x.otherCount+x.kandaharCount)} جنس</strong></div><div class="weekly-grid"><span>نور ولایتونه<b>${number(x.otherCount)} • ${number(x.otherMoney)} ؋</b></span><span>${localDeliveryLabel()}<b>${number(x.kandaharCount)} • ${number(x.kandaharMoney)} ؋</b></span></div></article>`).join('')}catch(e){toast(errorText(e))}}
+async function loadReport(){const request=++reportRequest;try{const d=await api('/report?'+(profile.role==='agent'?'report_branch='+agentReportBranch:adminBranchQuery()));if(request!==reportRequest)return;const rows=d.days,today=rows.find(x=>x.key===businessDayKey())||{otherCount:0,otherMoney:0,kandaharCount:0,kandaharMoney:0};$('#reportSummary').innerHTML=`<article><strong>${number(today.otherCount)} جنس</strong><span>نن نورو ولایتونو ته</span><b>${number(today.otherMoney)} ؋</b></article><article><strong>${number(today.kandaharCount)} جنس</strong><span>نن ${profile.role==='agent'?branchNames[agentReportBranch]:localDeliveryLabel()} کې</span><b>${number(today.kandaharMoney)} ؋</b></article><article><strong>${number(today.otherCount+today.kandaharCount)}</strong><span>نن ټول</span></article>`;$('#reportUsers').innerHTML=rows.map((x,i)=>`<article class="weekly-card"><div class="weekly-title"><div><small>${i===0&&x.key===businessDayKey()?'نن':'ورځ'}</small><h3>${businessDayLabel(x.key)}</h3></div><strong>${number(x.otherCount+x.kandaharCount)} جنس</strong></div><div class="weekly-grid"><span>نور ولایتونه<b>${number(x.otherCount)} • ${number(x.otherMoney)} ؋</b></span><span>${profile.role==='agent'?branchNames[agentReportBranch]:localDeliveryLabel()}<b>${number(x.kandaharCount)} • ${number(x.kandaharMoney)} ؋</b></span></div></article>`).join('')}catch(e){toast(errorText(e))}}
 
 $('#forgotPinBtn').onclick=()=>$('#forgotPinDialog').showModal();$('#closeForgotPin').onclick=$('#forgotPinOk').onclick=()=>$('#forgotPinDialog').close();
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js');
