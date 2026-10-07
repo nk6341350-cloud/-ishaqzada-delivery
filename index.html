@@ -67,6 +67,15 @@
     #ordersList .order-actions{flex-wrap:wrap}
     @media(max-width:380px){#ordersList .order-top{padding:15px}#ordersList .order-meta{padding-right:15px;padding-left:15px}#ordersList .order-foot{padding-right:15px;padding-left:15px}#ordersList .order-top h4{font-size:17px}}
   </style>
+  <style>
+    #kabulInventory{margin:20px 0;padding:18px;border:1px solid #d9e3ed;border-radius:22px;background:#fff;box-shadow:0 12px 30px rgba(8,42,82,.07)}
+    #kabulInventory h3{margin:0 0 12px;color:#0b2d55}
+    #kabulStockForm{display:grid;gap:12px;margin:0 0 18px}
+    #kabulStockForm .two-cols{align-items:end}
+    #kabulInventoryList{max-height:370px;overflow:auto;border-top:1px solid #e5ebf0}
+    #kabulInventoryList .stock-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 2px;border-bottom:1px solid #edf0f3;color:#243e59}
+    #kabulInventoryList .stock-row strong{min-width:42px;color:#0b2d55;text-align:left}
+  </style>
   <title>اسحاق‌زاده آنلاین ډیلیوري</title>
 </head>
 <body>
@@ -109,6 +118,14 @@
         <button id="changeOwnPin" class="secondary" type="button">زما PIN بدلول</button>
         <div class="admin-branch-filter hidden" style="margin:16px 0"><label>د لېږدونکي حساب<select data-admin-branch style="width:100%;margin-top:8px" aria-label="د لېږدونکي حساب"><option value="all">ټول</option><option value="kandahar">د کندهار لېږدونکی</option><option value="kabul">د کابل لېږدونکی</option></select></label></div>
         <div class="stats split-stats"><article class="other-provinces"><span>نن نورو ولایتونو ته</span><strong><b id="otherProvinceCount">0</b> جنسونه</strong><small><b id="otherProvinceMoney">0</b> ؋ افغانۍ</small></article><article class="emerald kandahar-stat"><span id="localDeliveryTitle">نن کندهار کې</span><strong><b id="kandaharCount">0</b> جنسونه</strong><small><b id="kandaharMoney">0</b> ؋ افغانۍ</small></article></div>
+        <section id="kabulInventory" class="hidden" aria-label="د کابل موجودي">
+          <h3>د کابل د جنسونو موجودي</h3>
+          <form id="kabulStockForm" class="hidden">
+            <label>د جنس نوم<select name="product_name" required aria-label="کابل ته د لېږلو جنس"><option value="" disabled selected>جنس انتخاب کړئ</option></select></label>
+            <div class="two-cols"><label>تعداد<input name="quantity" type="number" inputmode="numeric" min="1" max="1000000" step="1" required></label><button class="primary" type="submit">کابل ته موجودي زیاتول</button></div>
+          </form>
+          <div id="kabulInventoryList" aria-live="polite"></div>
+        </section>
         <div class="section-head"><h3 id="ordersTitle">زما وروستي آرډرونه</h3><button id="newOrderBtn">＋ نوی آرډر</button></div>
         <div id="ordersList" class="orders"></div><button id="moreOrdersBtn" class="secondary hidden more-orders" type="button">نور آرډرونه ښکاره کړئ</button><div id="ordersEmpty" class="empty"><span>📦</span><h3>آرډر نشته</h3><p>تر اوسه کوم آرډر نه دی ثبت شوی.</p></div>
       </section>
@@ -207,7 +224,7 @@
 </script>
 
   <script src="config.js?v=9"></script>
-  <script src="app.js?v=13"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>
 

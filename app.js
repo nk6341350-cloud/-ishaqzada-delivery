@@ -8,7 +8,7 @@ const userRoleLabel=u=>u.role==='dispatcher'?'د '+branchCity(u)+' لېږدون�
 const statusNames={registered:'ثبت شوی',sent:'ولېږل شو',delivered:'تسلیم شو'};
 let profile=null,currentOrders=[],ordersOffset=0,hasMoreOrders=false;
 const ORDER_PAGE_SIZE=20;
-let adminBranch='all',ordersRequest=0,statsRequest=0,reportRequest=0;
+let adminBranch='all',ordersRequest=0,statsRequest=0,reportRequest=0,inventoryRequest=0;
 const adminBranchQuery=()=>profile?.role==='admin'?'admin_branch='+adminBranch:'';
 function setupAdminBranchFilters(){
   adminBranch='all';
@@ -20,7 +20,7 @@ function setupAdminBranchFilters(){
     $('#ordersTitle').textContent=adminBranch==='all'?'ټول وروستي آرډرونه':'د '+branchNames[adminBranch]+' لېږدونکي آرډرونه';
     ['otherProvinceCount','otherProvinceMoney','kandaharCount','kandaharMoney'].forEach(id=>$('#'+id).textContent='—');
     $('#reportSummary').innerHTML='';$('#reportUsers').innerHTML='';
-    loadOrders(true);loadReport();
+    loadOrders(true);loadReport();showKabulInventory();
   }});
 }
 
@@ -48,6 +48,7 @@ async function api(path,opts={}){
   else if(route==='/me')action='me';
   else if(route==='/me/pin')action='change_pin';
   else if(route==='/orders')action=method==='POST'?'save_order':'orders';
+  else if(route==='/inventory')action=method==='POST'?'kabul_stock_add':'kabul_inventory';
   else if(route==='/stats')action='stats';
   else if(route==='/report')action='report';
   else if(route==='/users')action='users';
@@ -71,6 +72,7 @@ function compressImage(file,maxSide=900,quality=.68){return new Promise(resolve=
 $$('.tab').forEach(b=>b.onclick=()=>{$$('.tab').forEach(x=>x.classList.toggle('active',x===b));$$('#authView .form').forEach(f=>f.classList.toggle('active',f.id===b.dataset.auth))});
 $$('.nav').forEach(b=>b.onclick=()=>{show(b.dataset.view);if(b.dataset.view==='adminView')loadUsers();if(b.dataset.view==='reportView')loadReport()});
 provinces.forEach(p=>$('#orderForm select[name=province]').add(new Option(p,p)));
+[...$('#orderForm select[name=product_name]').options].filter(o=>o.value).forEach(o=>$('#kabulStockForm select[name=product_name]').add(new Option(o.text,o.value)));
 
 $('#setupForm').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget,f=new FormData(form),p=phone(f.get('phone')),pin=digits(f.get('pin'));if(!String(f.get('name')||'').trim()||!/^07\d{8}$/.test(p)||!/^\d{4}$/.test(pin))return toast('نوم، موبایل او PIN سم ولیکئ');busy(form,true);try{await api('/setup',{method:'POST',body:JSON.stringify({name:String(f.get('name')).trim(),phone:p,pin,code:String(f.get('code')||'')})});form.reset();toast('اډمین جوړ شو؛ اوس ننوځئ');show('authView')}catch(err){toast(errorText(err))}finally{busy(form,false)}};
 
@@ -80,7 +82,7 @@ $('#loginForm').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget
 $('#logoutBtn').onclick=$('#pendingLogout').onclick=async()=>{try{await api('/logout',{method:'POST',body:'{}'})}catch(_){}localStorage.removeItem('ishaqzada_token');profile=null;currentOrders=[];$('#bottomNav').classList.add('hidden');$('#logoutBtn').classList.add('hidden');show('authView')};
 
 async function boot(){try{const d=await api('/me');profile=d.profile;route()}catch(_){show('authView')}}
-function route(){if(!profile)return show('authView');$('#serviceNotice').classList.add('hidden');$('#logoutBtn').classList.remove('hidden');if(profile.status!=='approved'){show('pendingView');return}$('#bottomNav').classList.remove('hidden');$('#adminNav').classList.toggle('hidden',profile.role!=='admin');$('#newOrderBtn').classList.toggle('hidden',profile.role!=='agent');setupAdminBranchFilters();$('#userName').textContent=profile.full_name;$('#avatarFallback').textContent=profile.full_name?.[0]||'ا';$('#avatar').classList.remove('has-photo');$('#roleBadge').textContent=userRoleLabel(profile);$('#localDeliveryTitle').textContent='نن '+localDeliveryLabel()+' کې';$('#ordersTitle').textContent=profile.role==='agent'?'زما وروستي آرډرونه':'ټول وروستي آرډرونه';show('homeView');loadOrders(true)}
+function route(){if(!profile)return show('authView');$('#serviceNotice').classList.add('hidden');$('#logoutBtn').classList.remove('hidden');if(profile.status!=='approved'){show('pendingView');return}$('#bottomNav').classList.remove('hidden');$('#adminNav').classList.toggle('hidden',profile.role!=='admin');$('#newOrderBtn').classList.toggle('hidden',profile.role!=='agent');setupAdminBranchFilters();$('#userName').textContent=profile.full_name;$('#avatarFallback').textContent=profile.full_name?.[0]||'ا';$('#avatar').classList.remove('has-photo');$('#roleBadge').textContent=userRoleLabel(profile);$('#localDeliveryTitle').textContent='نن '+localDeliveryLabel()+' کې';$('#ordersTitle').textContent=profile.role==='agent'?'زما وروستي آرډرونه':'ټول وروستي آرډرونه';show('homeView');loadOrders(true);showKabulInventory()}
 
 async function loadOrders(reset=true){const request=++ordersRequest;if(reset){ordersOffset=0;currentOrders=[];hasMoreOrders=false;renderOrders();loadStats()}try{const d=await api(`/orders?offset=${ordersOffset}&limit=${ORDER_PAGE_SIZE}&${adminBranchQuery()}`);if(request!==ordersRequest)return;hasMoreOrders=d.hasMore;currentOrders=reset?d.orders:currentOrders.concat(d.orders);ordersOffset=currentOrders.length;renderOrders()}catch(e){if(request===ordersRequest)toast(errorText(e))}}
 
@@ -92,7 +94,32 @@ $('#newOrderBtn').onclick=()=>openOrder();$('#closeOrder').onclick=()=>$('#order
 function openOrder(id){const f=$('#orderForm');f.elements.product_name.querySelector('[data-legacy-product]')?.remove();f.reset();f.id.value='';$('#orderKicker').textContent='نوی آرډر';$('#deleteOrderBtn').classList.add('hidden');if(id){const o=currentOrders.find(x=>String(x.id)===String(id));if(!o)return;f.id.value=o.id;if(![...f.elements.product_name.options].some(x=>x.value===o.product_name)){const option=new Option(o.product_name,o.product_name);option.dataset.legacyProduct='';f.elements.product_name.add(option)}['product_name','customer_phone','province','quantity','address','price'].forEach(k=>f.elements[k].value=o[k]);f.elements.dispatch_branch.value=o.dispatch_branch||'kandahar';$('#orderKicker').textContent='آرډر اصلاح کړئ';if(profile.role==='agent'&&o.created_by===profile.id&&o.status==='registered'){$('#deleteOrderBtn').classList.remove('hidden');$('#deleteOrderBtn').dataset.id=o.id}}$('#orderDialog').showModal()}
 $('#orderForm').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget,f=new FormData(form),id=f.get('id');busy(form,true);try{const fd=new FormData();for(const k of ['id','product_name','customer_phone','province','quantity','address','price','dispatch_branch'])fd.set(k,f.get(k));await api('/orders',{method:'POST',body:fd});$('#orderDialog').close();toast(id?'آرډر اصلاح شو':'آرډر ثبت شو');loadOrders(true)}catch(err){toast(errorText(err))}finally{busy(form,false)}};
 $('#deleteOrderBtn').onclick=async()=>{const id=$('#deleteOrderBtn').dataset.id;if(!id||!confirm('ایا ډاډه یاست چې دا جنس مکمل ډیلیټ کړئ؟'))return;try{await api('/orders/'+id,{method:'DELETE',body:'{}'});$('#orderDialog').close();toast('جنس مکمل ډیلیټ شو');loadOrders(true)}catch(e){toast(errorText(e))}};
-async function advance(id){try{const d=await api('/orders/'+id+'/advance',{method:'POST',body:'{}'});toast(statusNames[d.status]);loadOrders(true)}catch(e){toast(errorText(e))}}
+async function advance(id){try{const d=await api('/orders/'+id+'/advance',{method:'POST',body:'{}'});toast(statusNames[d.status]);loadOrders(true);showKabulInventory()}catch(e){toast(errorText(e))}}
+
+
+function showKabulInventory(){
+  const visible=profile?.status==='approved' && (profile.role==='dispatcher' && profile.dispatch_branch==='kabul' || profile.role==='admin' && adminBranch==='kabul');
+  $('#kabulInventory').classList.toggle('hidden',!visible);
+  $('#kabulStockForm').classList.toggle('hidden',!visible||profile.role!=='admin');
+  if(!visible){++inventoryRequest;return}
+  loadKabulInventory();
+}
+async function loadKabulInventory(){
+  const request=++inventoryRequest;
+  try{
+    const d=await api('/inventory');
+    if(request!==inventoryRequest||$('#kabulInventory').classList.contains('hidden'))return;
+    $('#kabulInventoryList').innerHTML=d.items.map(item=>`<div class="stock-row"><span>${escapeHtml(item.product_name)}</span><strong>${number(item.quantity)}</strong></div>`).join('');
+  }catch(e){if(request===inventoryRequest)toast(errorText(e))}
+}
+$('#kabulStockForm').onsubmit=async e=>{
+  e.preventDefault();const form=e.currentTarget,f=new FormData(form);
+  if(profile?.role!=='admin'||adminBranch!=='kabul')return;
+  if(!/^[0-9]+$/.test(digits(f.get('quantity')))||Number(digits(f.get('quantity')))<1)return toast('تعداد سم ولیکئ');
+  busy(form,true);
+  try{await api('/inventory',{method:'POST',body:JSON.stringify({product_name:f.get('product_name'),quantity:digits(f.get('quantity'))})});form.elements.quantity.value='';toast('د کابل موجودي زیاته شوه');loadKabulInventory()}
+  catch(e){toast(errorText(e))}finally{busy(form,false)}
+};
 
 async function loadUsers(){try{const d=await api('/users');const pending=d.users.filter(u=>u.status==='pending'),approved=d.users.filter(u=>u.status==='approved'&&u.role!=='admin');$('#pendingCount').textContent=number(pending.length);$('#usersEmpty').style.display=pending.length?'none':'block';$('#pendingUsers').innerHTML=pending.map(u=>userCard(u,true)).join('');$('#approvedUsers').innerHTML=approved.map(u=>userCard(u,false)).join('');$$('[data-user-action]').forEach(b=>b.onclick=()=>userAction(b.dataset.uid,b.dataset.userAction));$$('[data-reset-pin]').forEach(b=>b.onclick=()=>openResetPin(b.dataset.resetPin,b.dataset.name))}catch(e){toast(errorText(e))}}
 function userCard(u,pending){return `<article class="user-card"><div class="user-top"><div class="user-identity"><div><h4>${escapeHtml(u.full_name)}</h4><p>☎ ${escapeHtml(u.phone)} • ${userRoleLabel(u)}</p></div></div><span class="badge">${pending?'انتظار':'تایید'}</span></div><div class="user-actions">${pending?`<button class="approve" data-uid="${u.id}" data-user-action="agent">د شاګرد په توګه تایید</button><button class="dispatch" data-uid="${u.id}" data-user-action="dispatcher_kandahar">د کندهار لېږدونکی</button><button class="dispatch" data-uid="${u.id}" data-user-action="dispatcher_kabul">د کابل لېږدونکی</button><button class="reject" data-uid="${u.id}" data-user-action="reject">رد</button>`:`<button class="approve" data-uid="${u.id}" data-user-action="agent">شاګرد</button><button class="dispatch" data-uid="${u.id}" data-user-action="dispatcher_kandahar">د کندهار لېږدونکی</button><button class="dispatch" data-uid="${u.id}" data-user-action="dispatcher_kabul">د کابل لېږدونکی</button><button class="reset-pin" data-reset-pin="${u.id}" data-name="${escapeHtml(u.full_name)}">PIN بدلول</button><button class="reject" data-uid="${u.id}" data-user-action="reject">بندول</button>`}</div></article>`}
