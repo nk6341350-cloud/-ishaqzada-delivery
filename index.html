@@ -107,6 +107,7 @@
       <section id="homeView" class="view page">
         <div class="welcome"><div><small>ښه راغلاست</small><h2 id="userName">—</h2><span id="roleBadge" class="pill"></span></div><div class="avatar-action"><div id="avatar" class="avatar"><span id="avatarFallback">ا</span></div></div></div>
         <button id="changeOwnPin" class="secondary" type="button">زما PIN بدلول</button>
+        <div class="admin-branch-filter hidden" style="margin:16px 0"><label>د لېږدونکي حساب<select data-admin-branch style="width:100%;margin-top:8px" aria-label="د لېږدونکي حساب"><option value="all">ټول</option><option value="kandahar">د کندهار لېږدونکی</option><option value="kabul">د کابل لېږدونکی</option></select></label></div>
         <div class="stats split-stats"><article class="other-provinces"><span>نن نورو ولایتونو ته</span><strong><b id="otherProvinceCount">0</b> جنسونه</strong><small><b id="otherProvinceMoney">0</b> ؋ افغانۍ</small></article><article class="emerald kandahar-stat"><span id="localDeliveryTitle">نن کندهار کې</span><strong><b id="kandaharCount">0</b> جنسونه</strong><small><b id="kandaharMoney">0</b> ؋ افغانۍ</small></article></div>
         <div class="section-head"><h3 id="ordersTitle">زما وروستي آرډرونه</h3><button id="newOrderBtn">＋ نوی آرډر</button></div>
         <div id="ordersList" class="orders"></div><button id="moreOrdersBtn" class="secondary hidden more-orders" type="button">نور آرډرونه ښکاره کړئ</button><div id="ordersEmpty" class="empty"><span>📦</span><h3>آرډر نشته</h3><p>تر اوسه کوم آرډر نه دی ثبت شوی.</p></div>
@@ -120,6 +121,7 @@
 
       <section id="reportView" class="view page">
         <div class="page-title"><div><small>له سهار 6 تر بل سهار 6</small><h2>ورځنی راپور</h2></div><button id="refreshBtn" class="mini">↻</button></div>
+        <div class="admin-branch-filter hidden" style="margin:16px 0"><label>د لېږدونکي حساب<select data-admin-branch style="width:100%;margin-top:8px" aria-label="د لېږدونکي حساب"><option value="all">ټول</option><option value="kandahar">د کندهار لېږدونکی</option><option value="kabul">د کابل لېږدونکی</option></select></label></div>
         <div id="reportSummary" class="report-summary"></div><div id="reportUsers" class="report-users"></div>
       </section>
     </main>
@@ -164,7 +166,7 @@
 </script>
 
   <script src="config.js?v=9"></script>
-  <script src="app.js?v=11"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>
 

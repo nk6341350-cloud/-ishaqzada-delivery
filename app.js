@@ -3,11 +3,27 @@ const provinces=['کندهار','کابل','هرات','بلخ','ننګرهار',
 const roleNames={admin:'اډمین',agent:'شاګرد',dispatcher:'د لېږلو مسؤل'};
 const branchNames={kandahar:'کندهار',kabul:'کابل'};
 const branchCity=o=>branchNames[o.dispatch_branch||'kandahar']||'کندهار';
-const localDeliveryLabel=()=>profile?.role==='dispatcher'?branchCity(profile):'خپل ښار';
+const localDeliveryLabel=()=>profile?.role==='dispatcher'?branchCity(profile):profile?.role==='admin'&&adminBranch!=='all'?branchNames[adminBranch]:'خپل ښار';
 const userRoleLabel=u=>u.role==='dispatcher'?'د '+branchCity(u)+' لېږدونکی':roleNames[u.role];
 const statusNames={registered:'ثبت شوی',sent:'ولېږل شو',delivered:'تسلیم شو'};
 let profile=null,currentOrders=[],ordersOffset=0,hasMoreOrders=false;
 const ORDER_PAGE_SIZE=20;
+let adminBranch='all',ordersRequest=0,statsRequest=0,reportRequest=0;
+const adminBranchQuery=()=>profile?.role==='admin'?'admin_branch='+adminBranch:'';
+function setupAdminBranchFilters(){
+  adminBranch='all';
+  $$('.admin-branch-filter').forEach(el=>el.classList.toggle('hidden',profile.role!=='admin'));
+  $$('[data-admin-branch]').forEach(el=>{el.value=adminBranch;el.onchange=()=>{
+    adminBranch=el.value;
+    $$('[data-admin-branch]').forEach(other=>other.value=adminBranch);
+    $('#localDeliveryTitle').textContent='نن '+localDeliveryLabel()+' کې';
+    $('#ordersTitle').textContent=adminBranch==='all'?'ټول وروستي آرډرونه':'د '+branchNames[adminBranch]+' لېږدونکي آرډرونه';
+    ['otherProvinceCount','otherProvinceMoney','kandaharCount','kandaharMoney'].forEach(id=>$('#'+id).textContent='—');
+    $('#reportSummary').innerHTML='';$('#reportUsers').innerHTML='';
+    loadOrders(true);loadReport();
+  }});
+}
+
 
 function show(id){$$('.view').forEach(v=>v.classList.toggle('active',v.id===id));$$('.nav').forEach(n=>n.classList.toggle('active',n.dataset.view===id))}
 function toast(msg){$('#toast').textContent=msg;$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),2800)}
@@ -39,6 +55,7 @@ async function api(path,opts={}){
   if(!action)throw new Error('عمل ونه موندل شو');
   if(query.has('offset'))payload.offset=Number(query.get('offset'));
   if(query.has('limit'))payload.limit=Number(query.get('limit'));
+  if(query.has('admin_branch'))payload.admin_branch=query.get('admin_branch');
   if(opts.body instanceof FormData)Object.assign(payload,Object.fromEntries(opts.body.entries()));
   else if(opts.body)Object.assign(payload,JSON.parse(opts.body));
   const key=config.publishableKey,token=localStorage.getItem('ishaqzada_token')||'';
@@ -63,12 +80,13 @@ $('#loginForm').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget
 $('#logoutBtn').onclick=$('#pendingLogout').onclick=async()=>{try{await api('/logout',{method:'POST',body:'{}'})}catch(_){}localStorage.removeItem('ishaqzada_token');profile=null;currentOrders=[];$('#bottomNav').classList.add('hidden');$('#logoutBtn').classList.add('hidden');show('authView')};
 
 async function boot(){try{const d=await api('/me');profile=d.profile;route()}catch(_){show('authView')}}
-function route(){if(!profile)return show('authView');$('#serviceNotice').classList.add('hidden');$('#logoutBtn').classList.remove('hidden');if(profile.status!=='approved'){show('pendingView');return}$('#bottomNav').classList.remove('hidden');$('#adminNav').classList.toggle('hidden',profile.role!=='admin');$('#newOrderBtn').classList.toggle('hidden',profile.role!=='agent');$('#userName').textContent=profile.full_name;$('#avatarFallback').textContent=profile.full_name?.[0]||'ا';$('#avatar').classList.remove('has-photo');$('#roleBadge').textContent=userRoleLabel(profile);$('#localDeliveryTitle').textContent='نن '+localDeliveryLabel()+' کې';$('#ordersTitle').textContent=profile.role==='agent'?'زما وروستي آرډرونه':'ټول وروستي آرډرونه';show('homeView');loadOrders(true)}
+function route(){if(!profile)return show('authView');$('#serviceNotice').classList.add('hidden');$('#logoutBtn').classList.remove('hidden');if(profile.status!=='approved'){show('pendingView');return}$('#bottomNav').classList.remove('hidden');$('#adminNav').classList.toggle('hidden',profile.role!=='admin');$('#newOrderBtn').classList.toggle('hidden',profile.role!=='agent');setupAdminBranchFilters();$('#userName').textContent=profile.full_name;$('#avatarFallback').textContent=profile.full_name?.[0]||'ا';$('#avatar').classList.remove('has-photo');$('#roleBadge').textContent=userRoleLabel(profile);$('#localDeliveryTitle').textContent='نن '+localDeliveryLabel()+' کې';$('#ordersTitle').textContent=profile.role==='agent'?'زما وروستي آرډرونه':'ټول وروستي آرډرونه';show('homeView');loadOrders(true)}
 
-async function loadOrders(reset=true){if(reset){ordersOffset=0;currentOrders=[]}try{const d=await api(`/orders?offset=${ordersOffset}&limit=${ORDER_PAGE_SIZE}`);hasMoreOrders=d.hasMore;currentOrders=reset?d.orders:currentOrders.concat(d.orders);ordersOffset=currentOrders.length;renderOrders();if(reset)loadStats()}catch(e){toast(errorText(e))}}
+async function loadOrders(reset=true){const request=++ordersRequest;if(reset){ordersOffset=0;currentOrders=[];hasMoreOrders=false;renderOrders();loadStats()}try{const d=await api(`/orders?offset=${ordersOffset}&limit=${ORDER_PAGE_SIZE}&${adminBranchQuery()}`);if(request!==ordersRequest)return;hasMoreOrders=d.hasMore;currentOrders=reset?d.orders:currentOrders.concat(d.orders);ordersOffset=currentOrders.length;renderOrders()}catch(e){if(request===ordersRequest)toast(errorText(e))}}
+
 function renderOrders(){const box=$('#ordersList');box.innerHTML='';$('#ordersEmpty').style.display=currentOrders.length?'none':'block';box.innerHTML=currentOrders.map(o=>{const canEdit=profile.role==='agent'&&o.created_by===profile.id&&o.status==='registered',canMove=profile.role==='dispatcher'&&o.status==='registered'&&(o.dispatch_branch||'kandahar')===(profile.dispatch_branch||'kandahar'),action=o.province===branchCity(o)?'تسلیم شو':'ولېږل شو';return `<article class="order-card"><div class="order-main"><div class="order-top"><h4>${escapeHtml(o.product_name)}</h4><span class="badge ${o.status}">${statusNames[o.status]}</span></div><div class="order-meta"><span>📍 ${escapeHtml(o.province)}</span><span>🚚 د ${branchCity(o)} لېږدونکی</span><span>📦 ${number(o.quantity)}</span><span>☎ ${escapeHtml(o.customer_phone)}</span>${profile.role!=='agent'?`<span>👤 ${escapeHtml(o.creator_name||'نوم نه دی موندل شوی')}</span>`:''}</div><div class="order-meta"><span>📅 ثبت: ${orderDateTime(o.created_at)}</span></div><div class="order-meta"><span>📌 ادرس: ${escapeHtml(o.address)}</span></div><div class="order-foot"><strong>${number(o.price)} ؋</strong><div class="order-actions">${canEdit?`<button class="small-btn" data-edit="${o.id}">اصلاح</button>`:''}${canMove?`<button class="small-btn action" data-move="${o.id}">${action}</button>`:''}</div></div></div></article>`}).join('');$$('[data-edit]').forEach(b=>b.onclick=()=>openOrder(b.dataset.edit));$$('[data-move]').forEach(b=>b.onclick=()=>advance(b.dataset.move));$('#moreOrdersBtn').classList.toggle('hidden',!hasMoreOrders)}
 $('#moreOrdersBtn').onclick=()=>loadOrders(false);
-async function loadStats(){try{const d=await api('/stats');$('#otherProvinceCount').textContent=number(d.otherCount);$('#otherProvinceMoney').textContent=number(d.otherMoney);$('#kandaharCount').textContent=number(d.kandaharCount);$('#kandaharMoney').textContent=number(d.kandaharMoney)}catch(_){}}
+async function loadStats(){const request=++statsRequest;try{const d=await api('/stats?'+adminBranchQuery());if(request!==statsRequest)return;$('#otherProvinceCount').textContent=number(d.otherCount);$('#otherProvinceMoney').textContent=number(d.otherMoney);$('#kandaharCount').textContent=number(d.kandaharCount);$('#kandaharMoney').textContent=number(d.kandaharMoney)}catch(_){}}
 
 $('#newOrderBtn').onclick=()=>openOrder();$('#closeOrder').onclick=()=>$('#orderDialog').close();
 function openOrder(id){const f=$('#orderForm');f.reset();f.id.value='';$('#orderKicker').textContent='نوی آرډر';$('#deleteOrderBtn').classList.add('hidden');if(id){const o=currentOrders.find(x=>String(x.id)===String(id));if(!o)return;f.id.value=o.id;['product_name','customer_phone','province','quantity','address','price'].forEach(k=>f.elements[k].value=o[k]);f.elements.dispatch_branch.value=o.dispatch_branch||'kandahar';$('#orderKicker').textContent='آرډر اصلاح کړئ';if(profile.role==='agent'&&o.created_by===profile.id&&o.status==='registered'){$('#deleteOrderBtn').classList.remove('hidden');$('#deleteOrderBtn').dataset.id=o.id}}$('#orderDialog').showModal()}
@@ -88,7 +106,7 @@ $('#closeOwnPin').onclick=()=>$('#ownPinDialog').close();
 $('#ownPinForm').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget,f=new FormData(form),oldPin=digits(f.get('oldPin')),newPin=digits(f.get('newPin'));if(!/^\d{4}$/.test(oldPin)||!/^\d{4}$/.test(newPin))return toast('څلور عددي PIN ولیکئ');busy(form,true);try{await api('/me/pin',{method:'PATCH',body:JSON.stringify({oldPin,newPin})});form.reset();$('#ownPinDialog').close();localStorage.removeItem('ishaqzada_token');profile=null;$('#bottomNav').classList.add('hidden');$('#logoutBtn').classList.add('hidden');show('authView');toast('PIN بدل شو؛ بیا ننوځئ')}catch(err){toast(errorText(err))}finally{busy(form,false)}};
 
 $('#refreshBtn').onclick=loadReport;
-async function loadReport(){try{const d=await api('/report'),rows=d.days,today=rows.find(x=>x.key===businessDayKey())||{otherCount:0,otherMoney:0,kandaharCount:0,kandaharMoney:0};$('#reportSummary').innerHTML=`<article><strong>${number(today.otherCount)} جنس</strong><span>نن نورو ولایتونو ته</span><b>${number(today.otherMoney)} ؋</b></article><article><strong>${number(today.kandaharCount)} جنس</strong><span>نن ${localDeliveryLabel()} کې</span><b>${number(today.kandaharMoney)} ؋</b></article><article><strong>${number(today.otherCount+today.kandaharCount)}</strong><span>نن ټول</span></article>`;$('#reportUsers').innerHTML=rows.map((x,i)=>`<article class="weekly-card"><div class="weekly-title"><div><small>${i===0&&x.key===businessDayKey()?'نن':'ورځ'}</small><h3>${businessDayLabel(x.key)}</h3></div><strong>${number(x.otherCount+x.kandaharCount)} جنس</strong></div><div class="weekly-grid"><span>نور ولایتونه<b>${number(x.otherCount)} • ${number(x.otherMoney)} ؋</b></span><span>${localDeliveryLabel()}<b>${number(x.kandaharCount)} • ${number(x.kandaharMoney)} ؋</b></span></div></article>`).join('')}catch(e){toast(errorText(e))}}
+async function loadReport(){const request=++reportRequest;try{const d=await api('/report?'+adminBranchQuery());if(request!==reportRequest)return;const rows=d.days,today=rows.find(x=>x.key===businessDayKey())||{otherCount:0,otherMoney:0,kandaharCount:0,kandaharMoney:0};$('#reportSummary').innerHTML=`<article><strong>${number(today.otherCount)} جنس</strong><span>نن نورو ولایتونو ته</span><b>${number(today.otherMoney)} ؋</b></article><article><strong>${number(today.kandaharCount)} جنس</strong><span>نن ${localDeliveryLabel()} کې</span><b>${number(today.kandaharMoney)} ؋</b></article><article><strong>${number(today.otherCount+today.kandaharCount)}</strong><span>نن ټول</span></article>`;$('#reportUsers').innerHTML=rows.map((x,i)=>`<article class="weekly-card"><div class="weekly-title"><div><small>${i===0&&x.key===businessDayKey()?'نن':'ورځ'}</small><h3>${businessDayLabel(x.key)}</h3></div><strong>${number(x.otherCount+x.kandaharCount)} جنس</strong></div><div class="weekly-grid"><span>نور ولایتونه<b>${number(x.otherCount)} • ${number(x.otherMoney)} ؋</b></span><span>${localDeliveryLabel()}<b>${number(x.kandaharCount)} • ${number(x.kandaharMoney)} ؋</b></span></div></article>`).join('')}catch(e){toast(errorText(e))}}
 
 $('#forgotPinBtn').onclick=()=>$('#forgotPinDialog').showModal();$('#closeForgotPin').onclick=$('#forgotPinOk').onclick=()=>$('#forgotPinDialog').close();
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js');
