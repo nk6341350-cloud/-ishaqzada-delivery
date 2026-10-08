@@ -115,7 +115,7 @@ async function loadKabulInventory(){
     const d=await api('/inventory');
     if(request!==inventoryRequest||$('#kabulInventory').classList.contains('hidden'))return;
     $('#kabulInventoryList').innerHTML=d.items.map(item=>`<div class="stock-row"><span>${escapeHtml(item.product_name)}</span><span class="stock-controls"><strong>${number(item.quantity)}</strong>${profile.role==='admin'&&adminBranch==='kabul'?`<button type="button" class="small-btn" data-stock-correct="${escapeHtml(item.product_name)}">اصلاح</button>`:''}</span></div>`).join('');
-    $('[data-stock-correct]').forEach(button=>button.onclick=()=>correctKabulStock(button.dataset.stockCorrect,d.items.find(item=>item.product_name===button.dataset.stockCorrect)?.quantity));
+    $$('[data-stock-correct]').forEach(button=>button.onclick=()=>correctKabulStock(button.dataset.stockCorrect,d.items.find(item=>item.product_name===button.dataset.stockCorrect)?.quantity));
   }catch(e){if(request===inventoryRequest)toast(errorText(e))}
 }
 async function correctKabulStock(productName,currentQuantity){
@@ -160,4 +160,5 @@ $('#forgotPinBtn').onclick=()=>$('#forgotPinDialog').showModal();$('#closeForgot
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js');
 async function start(){try{const d=await api('/setup');if(!d.ready){show('setupView');return}}catch(e){toast(errorText(e));show('authView');return}boot()}
 start();
+
 
