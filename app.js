@@ -52,7 +52,7 @@ async function api(path,opts={}){
   else if(route==='/me')action='me';
   else if(route==='/me/pin')action='change_pin';
   else if(route==='/orders')action=method==='POST'?'save_order':'orders';
-  else if(route==='/inventory')action=method==='POST'?'kabul_stock_add':'kabul_inventory';
+  else if(route==='/inventory')action=method==='POST'?'kabul_stock_add':method==='PATCH'?'kabul_stock_correct':'kabul_inventory';
   else if(route==='/stats')action='stats';
   else if(route==='/report')action='report';
   else if(route==='/users')action='users';
@@ -114,8 +114,23 @@ async function loadKabulInventory(){
   try{
     const d=await api('/inventory');
     if(request!==inventoryRequest||$('#kabulInventory').classList.contains('hidden'))return;
-    $('#kabulInventoryList').innerHTML=d.items.map(item=>`<div class="stock-row"><span>${escapeHtml(item.product_name)}</span><strong>${number(item.quantity)}</strong></div>`).join('');
+    $('#kabulInventoryList').innerHTML=d.items.map(item=>`<div class="stock-row"><span>${escapeHtml(item.product_name)}</span><span class="stock-controls"><strong>${number(item.quantity)}</strong>${profile.role==='admin'&&adminBranch==='kabul'?`<button type="button" class="small-btn" data-stock-correct="${escapeHtml(item.product_name)}">اصلاح</button>`:''}</span></div>`).join('');
+    $('[data-stock-correct]').forEach(button=>button.onclick=()=>correctKabulStock(button.dataset.stockCorrect,d.items.find(item=>item.product_name===button.dataset.stockCorrect)?.quantity));
   }catch(e){if(request===inventoryRequest)toast(errorText(e))}
+}
+async function correctKabulStock(productName,currentQuantity){
+  if(profile?.role!=='admin'||adminBranch!=='kabul'||!Number.isInteger(currentQuantity))return;
+  const entered=prompt('د «'+productName+'» اوسنی پاتې موجودي سمه کړئ. اوس: '+number(currentQuantity),String(currentQuantity));
+  if(entered===null)return;
+  const value=digits(entered);
+  if(!/^[0-9]{1,7}$/.test(value)||Number(value)>1000000)return toast('تعداد سم ولیکئ');
+  const correctedQuantity=Number(value);
+  if(correctedQuantity===currentQuantity)return;
+  if(!confirm('د «'+productName+'» موجودي له '+number(currentQuantity)+' څخه '+number(correctedQuantity)+' ته بدلېږي. تایید یې کوئ؟'))return;
+  try{
+    await api('/inventory',{method:'PATCH',body:JSON.stringify({product_name:productName,expected_quantity:currentQuantity,quantity:correctedQuantity})});
+    toast('د کابل موجودي اصلاح شوه');loadKabulInventory()
+  }catch(e){toast(errorText(e));loadKabulInventory()}
 }
 $('#kabulStockForm').onsubmit=async e=>{
   e.preventDefault();const form=e.currentTarget,f=new FormData(form);
